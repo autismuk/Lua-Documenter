@@ -141,7 +141,7 @@ end
 --//	@class 		[DocStore]			Documentation for that class
 
 function SourceProcessor:renderClass(handle,class)
-	handle:write("<hr><h1>" .. class.name .. "</h1>\n")
+	handle:write("<hr><h1>CLASS : " .. class.name .. "</h1>\n")
 	handle:write("<p><b>Extends " .. class.baseClass .. "</b></p>\n")
 	handle:write("<p>"..class.comment.."</p><hr>\n")
 end
@@ -163,7 +163,7 @@ function SourceProcessor:renderMethod(handle,method)
 			handle:write("<td>"..p.."</td>")
 			local typeDesc = "" 																-- type descriptor
 			local paramComment = method.attributes[p:lower()] or "" 							-- get the attribute if there is one.
-			local td,pc = paramComment:match("^%[(%w+)]%s*(.*)$")
+			local td,pc = paramComment:match("^%[(.*)%]%s*(.*)$")
 			if td ~= nil then typeDesc = td paramComment = pc end
 
 			handle:write("<td>"..typeDesc.."</td><td>"..paramComment.."</td>")
@@ -184,9 +184,10 @@ function SourceProcessor:getSortedKeys(inTable)
 	table.sort(keys)																			-- sort the table
 	return keys
 end
-local sp = SourceProcessor:new()
-sp:process("luadoc.lua")
 
-h = io.open("doc.html","w")
+local sp = SourceProcessor:new() 																-- create a source processor
+for _,file in ipairs(arg) do sp:process(file) end 												-- process all the command line files
+
+h = io.open("doc.html","w") 																	-- output the result
 sp:renderHTML(h)
 h:close()
