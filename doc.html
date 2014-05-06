@@ -1,0 +1,51 @@
+<!DOCTYPE html><html><head><style> body { background:#006; color:white; font-family:Arial,Verdana;} table,tr,td { padding:4px;border:1px solid white; border-collapse:collapse; } </style></head><body>
+<hr><h1>DocStore</h1>
+<p><b>Extends Base</b></p>
+<p>This is the main storage class which holds a 'chunk' of comments and attributes, it is general purpose because at the time of creation we don't know whether it refers to a class or a method.</p><hr>
+<h2>(constructor)()</h2>
+<p>Creates an empty storage element</p>
+<h2>addLine(line)</h2>
+<table>
+<tr><td>line</td><td>string</td><td>the line to add (should still have --// prefix)</td></tr>
+</table>
+<p>Add a comment line (e.g. one that is prefixed with the -- // sequence) to a documentation store</p>
+<h2>strip(line)</h2>
+<table>
+<tr><td>line</td><td>string</td><td>line to strip of spaces</td></tr>
+<tr><td>return</td><td>string</td><td>stripped line</td></tr>
+</table>
+<p>Remove leading and trailing spaces from a line, and convert tabs to spaces.</p>
+<hr><h1>SourceProcessor</h1>
+<p><b>Extends Base</b></p>
+<p>This class processes a file, scanning for the inline document text and class and method signatures</p><hr>
+<h2>(constructor)()</h2>
+<p>Constructor</p>
+<h2>getSortedKeys(inTable)</h2>
+<table>
+<tr><td>inTable</td><td>table</td><td>table whose keys are required</td></tr>
+<tr><td>return</td><td></td><td>sorted list of the keys</td></tr>
+</table>
+<p>Return a sorted list of the keys in a table</p>
+<h2>process(sourceFile)</h2>
+<table>
+<tr><td>sourceFile</td><td>string</td><td>File to scan.</td></tr>
+</table>
+<p>Scan a source file for inline comments, classes and methods and store them appropriately.</p>
+<h2>renderClass(handle,class)</h2>
+<table>
+<tr><td>handle</td><td></td><td>[i/o handle]  File handle</td></tr>
+<tr><td>class</td><td>DocStore</td><td>Documentation for that class</td></tr>
+</table>
+<p>Render documentation for a class in HTML</p>
+<h2>renderHTML(handle)</h2>
+<table>
+<tr><td>handle</td><td></td><td>[I/O Handle] handle to render it to.</td></tr>
+</table>
+<p>Render the complete scanned documentation as HTML</p>
+<h2>renderMethod(handle,method)</h2>
+<table>
+<tr><td>handle</td><td></td><td>[i/o handle]  File handle</td></tr>
+<tr><td>method</td><td>DocStore</td><td>Documentation for that method</td></tr>
+</table>
+<p>Render documentation for a method in HTML</p>
+<hr><p><i>LUA Autodoc by Paul Robson 2014</i></p><hr></body></html>
