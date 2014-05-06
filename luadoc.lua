@@ -153,9 +153,10 @@ end
 
 function SourceProcessor:renderMethod(handle,method)
 	handle:write("<h2>"..method.name.."("..method.parameters..")</h2>\n")
-	if method.parameters ~= "" then 															-- process parameters
+	if method.parameters ~= "" or method.attributes["return"] ~= nil then 						-- process parameters/return
 		handle:write("<table>\n")
-		local params = method.parameters .. "," 												-- make sure there's a trailing comma
+		local params = method.parameters 														-- get parameters, if any.
+		if params ~= "" then params = params .. "," end 										-- add trailing comma if there are already parameters
 		if method.attributes["return"] ~= nil then params = params .. "return," end 			-- if @return was specified add it.
 		while params ~= "" do 																	-- keep going till finished.
 			local p = params:match("^(%w+),") 													-- extract parameter.
