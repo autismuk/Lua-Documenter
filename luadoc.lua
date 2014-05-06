@@ -121,7 +121,8 @@ end
 --// 	@handle [I/O Handle] handle to render it to.
 
 function SourceProcessor:renderHTML(handle)
-	local css = "<style> body { background:#006; color:white; font-family:Arial,Verdana;} table,tr,td { padding:4px;border:1px solid white; border-collapse:collapse; } </style>"
+	local css = "body { background:#333; color:#0F0; font-family:Arial,Verdana;} h1 { color:#FF0; } h2 { color:#0FF } table,tr,td { color: #CCC; padding:4px;border:1px solid white; border-collapse:collapse; }"
+	local css = "<style>"..css.."</style>"
 	handle:write("<!DOCTYPE html><html><head>"..css.."</head><body>\n")							-- header
 	local classList = self:getSortedKeys(self.classes) 	 										-- get all the names of the classes
 	for _,class in ipairs(classList) do 														-- work through the classes
@@ -141,8 +142,8 @@ end
 --//	@class 		[DocStore]			Documentation for that class
 
 function SourceProcessor:renderClass(handle,class)
-	handle:write("<hr><h1>CLASS : " .. class.name .. "</h1>\n")
-	handle:write("<p><b>Extends " .. class.baseClass .. "</b></p>\n")
+	handle:write("<hr><h1>" .. class.name .. "</h1>\n")
+	handle:write("<p><h3>Extends " .. class.baseClass .. "</h3></p>\n")
 	handle:write("<p>"..class.comment.."</p><hr>\n")
 end
 
