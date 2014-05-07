@@ -152,6 +152,7 @@ end
 --//	@method 	[DocStore]			Documentation for that method
 
 function SourceProcessor:renderMethod(handle,method)
+	if method.comment ~= "" and method.comment:sub(1,1) == "%" then return end 					-- do not comment anything whose comments prefix with %
 	handle:write("<h2>"..method.name.."("..method.parameters..")</h2>\n")
 	if method.parameters ~= "" or method.attributes["return"] ~= nil then 						-- process parameters/return
 		handle:write("<table>\n")
