@@ -92,7 +92,7 @@ function SourceProcessor:process(sourceFile)
 				self.current.baseClass = baseClass 										
 				self.classes[newClass] = self.current 											-- make the current document store the info for this class.
 				self.current = DocStore:new() 													-- and we have a new document store.
-				print("    Found class " .. newClass)
+				-- print("    Found class " .. newClass)
 				-- print("*",newClass,baseClass,line,self.classes[newClass].comment)
 			end 
 								
@@ -108,7 +108,7 @@ function SourceProcessor:process(sourceFile)
 				self.current.name = method 														-- name is method - this is kept in the methods table of the class
 				self.current.parameters = parameters 											-- save the parameter list
 				self.current = DocStore:new() 													-- a new document store
-				print("        Found method "..class..":"..method.."("..parameters..")")
+				-- print("        Found method "..class..":"..method.."("..parameters..")")
 				-- print(">",class,method,parameters,thisClass.methods[method].comment)
 			end
 		end
@@ -121,7 +121,7 @@ end
 --// 	@handle [I/O Handle] handle to render it to.
 
 function SourceProcessor:renderHTML(handle)
-	local css = "body { background:#333; color:#0F0; font-family:Arial,Verdana;} h1 { color:#FF0; } h2 { color:#0FF } table,tr,td { color: #CCC; padding:4px;border:1px solid white; border-collapse:collapse; }"
+	local css = "body { background:#333; color:#0F0; font-family:Arial,Verdana;} a { color:#0AA } h1 { color:#FF0; } h2 { color:#0FF } table,tr,td { color: #CCC; padding:4px;border:1px solid white; border-collapse:collapse; }"
 	local css = "<style>"..css.."</style>"
 	handle:write("<!DOCTYPE html><html><head>"..css.."</head><body>\n")							-- header
 	local classList = self:getSortedKeys(self.classes) 	 										-- get all the names of the classes
@@ -129,7 +129,7 @@ function SourceProcessor:renderHTML(handle)
 		self:renderClass(handle,self.classes[class]) 											-- render the class.
 		local methodlist = self:getSortedKeys(self.classes[class].methods) 						-- get all the names of its methods
 		for _,method in ipairs(methodlist) do 													-- work through them
-			self:renderMethod(handle,self.classes[class].methods[method]) 						-- and render them.
+			self:renderMethod(handle,self.classes[class].methods[method],self.classes[class]) 	-- and render them.
 		end
 	end
 	handle:write("<hr><p><i>LUA Autodoc by Paul Robson 2014</i></p><hr>")
@@ -142,16 +142,45 @@ end
 --//	@class 		[DocStore]			Documentation for that class
 
 function SourceProcessor:renderClass(handle,class)
+	handle:write('<a name="'..class.name..'"></a>\n')
 	handle:write("<hr><h1>" .. class.name .. "</h1>\n")
 	handle:write("<p><h3>Extends " .. class.baseClass .. "</h3></p>\n")
-	handle:write("<p>"..class.comment.."</p><hr>\n")
+	handle:write("<p>"..class.comment.."</p>\n")
+	local methodList = {} 																		-- work out all the known methods.
+	local completed = false
+	local currentClass = class
+	while not completed do  																	-- while still going back up the tree.
+		for _,method in pairs(currentClass.methods) do 											-- work through all the methods
+			if method.comment == "" or method.comment:sub(1,1) ~= "%" then
+				if methodList[method.name] == nil then 											-- if doesn't already exist.
+					methodList[method.name] = currentClass 										-- put in hash with their class.
+				end
+			end
+		end
+		currentClass = self.classes[currentClass.baseClass] 									-- back up the tree.
+		if currentClass == nil then completed = true end
+	end
+	local methods = self:getSortedKeys(methodList) 												-- make it a sorted list.
+	handle:write("<p>Methods : ")
+	for i = 1,#methods do 
+		if i > 1 then handle:write(",") end
+		handle:write('<a href="#'..methodList[methods[i]].name..'_'..methods[i]..'"/>')
+		if methodList[methods[i]] ~= class then
+			handle:write("<i>"..methods[i].."</i>")
+		else
+			handle:write(methods[i])
+		end
+		handle:write("</a>")
+	end
+	handle:write("</p><hr>")
 end
 
 --//	Render documentation for a method in HTML
 --//	@handle 	[i/o handle]		File handle
 --//	@method 	[DocStore]			Documentation for that method
 
-function SourceProcessor:renderMethod(handle,method)
+function SourceProcessor:renderMethod(handle,method,class)
+	handle:write('<a name="'..class.name..'_'..method.name..'"></a>\n')
 	if method.comment ~= "" and method.comment:sub(1,1) == "%" then return end 					-- do not comment anything whose comments prefix with %
 	handle:write("<h2>"..method.name.."("..method.parameters..")</h2>\n")
 	if method.parameters ~= "" or method.attributes["return"] ~= nil then 						-- process parameters/return
