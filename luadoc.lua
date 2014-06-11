@@ -84,7 +84,7 @@ function SourceProcessor:process(sourceFile)
 		else 												
 			local p = line:find("%-%-")															-- remove comments if any. Hopefully [[ ]] comments shouldn't matter.
 			if p ~= nil then line = line:sub(1,p) end
-			local newClass,baseClass = line:match("([A-Z]%w*)%s=%s(%w+)%:new%(%)") 				-- detect a class definition this is checks for newClass = baseClass:new()
+			local newClass,baseClass = line:match("([A-Z]%w*)%s=%s([%w%.%(%)]+)%:new%(%)") 		-- detect a class definition this is checks for newClass = baseClass:new()
 																								-- but newClass must be capitalised in class definitions.
 			if newClass ~= nil then 															-- found such a class.
 				assert(self.classes[newClass] == nil,"Class duplicated "..newClass)				-- check it doesn't already exist (consequences for local classes)
@@ -97,7 +97,7 @@ function SourceProcessor:process(sourceFile)
 			end 
 								
 			local class,method,parameters =														-- detect a function definition <class>:<method>(<parameters>), again class capitalised. 
-									line:match("function%s+([A-Z]%w*)%:([%w%_]+)%(%s*([%w%,]*)%s*%)")		-- this is very specific to my coding style :)
+									line:match("function%s+([A-Z]%w*)%:([%w%_]+)%(%s*([%w%.%,]*)%s*%)")		-- this is very specific to my coding style :)
 
 			if class ~= nil then 																-- found a method definition.
 				assert(self.classes[class] ~= nil,"Class unknown in method def "..line) 		-- the class must have been defined already.
@@ -106,7 +106,7 @@ function SourceProcessor:process(sourceFile)
 				assert(thisClass.methods[method] == nil,"Duplicate method "..line)				-- check the method doesn't already exist.
 				thisClass.methods[method] = self.current 										-- save doc store in methods table for the class.
 				self.current.name = method 														-- name is method - this is kept in the methods table of the class
-				self.current.parameters = parameters 											-- save the parameter list
+				self.current.parameters = parameters:gsub("%,%.%.%.","") 						-- save the parameter list
 				self.current = DocStore:new() 													-- a new document store
 				-- print("        Found method "..class..":"..method.."("..parameters..")")
 				-- print(">",class,method,parameters,thisClass.methods[method].comment)
