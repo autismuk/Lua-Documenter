@@ -189,7 +189,7 @@ function SourceProcessor:renderMethod(handle,method,class)
 		if params ~= "" then params = params .. "," end 										-- add trailing comma if there are already parameters
 		if method.attributes["return"] ~= nil then params = params .. "return," end 			-- if @return was specified add it.
 		while params ~= "" do 																	-- keep going till finished.
-			local p = params:match("^(%w+),") 													-- extract parameter.
+			local p = params:match("^([%w%.]+),") 												-- extract parameter.
 			params = params:sub(#p+2) 															-- remove from string.
 			handle:write("<tr>")
 			handle:write("<td>"..p.."</td>")
