@@ -85,6 +85,11 @@ function SourceProcessor:process(sourceFile)
 			local p = line:find("%-%-")															-- remove comments if any. Hopefully [[ ]] comments shouldn't matter.
 			if p ~= nil then line = line:sub(1,p) end
 			local newClass,baseClass = line:match("([A-Z]%w*)%s=%s([%w%.%(%)]+)%:new%(%)") 		-- detect a class definition this is checks for newClass = baseClass:new()
+
+			if newClass == nil then 
+				newClass = line:match("([A-Z]%w*)%s*%=%s*%w+%:createClass%(%)")
+				if newClass ~= nil then baseClass = "ExecutiveBaseClass" end
+			end
 																								-- but newClass must be capitalised in class definitions.
 			if newClass ~= nil then 															-- found such a class.
 				assert(self.classes[newClass] == nil,"Class duplicated "..newClass)				-- check it doesn't already exist (consequences for local classes)
